@@ -4,6 +4,7 @@ from advent.db.legacy.models import DgScript
 from .exceptions import DgScriptError
 from evennia.utils.ansi import strip_ansi
 import operator as o
+import re
 
 
 class DgState(IntEnum):
@@ -62,6 +63,22 @@ def matching_paren(src: str, start: int) -> int:
 
     except IndexError:
         return -1
+
+
+def matching_perc(src: str, start: int) -> int:
+    try:
+        current = start + 1
+        while True:
+            match src[current]:
+                case "(":
+                    current = matching_paren(src, current)
+                    continue
+                case "%":
+                    return current
+            current += 1
+    except IndexError:
+        return -1
+
 
 
 class DgScriptInstance:
@@ -421,6 +438,8 @@ class DgScriptInstance:
             i += 1
 
         raise DgScriptError("'if' without corresponding end")
+
+    _re_expr = re.compile(r"^(?P<everything>(?P<var>\w+)(?:.(?P<field>\w+?)?)?(?P<call>\((?P<arg>[\w| ]+)?\))?)$")
 
     def eval_var(self, varname: str, field: str, call: str, arg: str) -> str:
         pass
