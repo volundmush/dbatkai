@@ -32,27 +32,12 @@ class ResetCommand(models.Model):
         unique_together = (("zone", "line"),)
 
 
-class MobProto(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="mobile_prototypes")
-    name = models.CharField(max_length=100)
-    color_name = models.CharField(max_length=150)
-    short_description = models.CharField(max_length=100)
-    data = models.JSONField(null=False, blank=False)
-
-
-class ObjProto(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="object_prototypes")
-    name = models.CharField(max_length=100)
-    color_name = models.CharField(max_length=150)
-    short_description = models.CharField(max_length=100)
-    data = models.JSONField(null=False, blank=False)
-
-
 class DgScript(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="dgscript_prototypes")
     name = models.CharField(max_length=100)
     color_name = models.CharField(max_length=150)
     attach_type = models.IntegerField(default=0)
+    trigger_type = models.JSONField(null=True)
     data_type = models.IntegerField(default=0)
     narg = models.SmallIntegerField(default=0)
     arglist = models.CharField(max_length=255)
@@ -72,7 +57,7 @@ class LegacyGuild(models.Model):
     no_such_skill = models.CharField(max_length=255)
     not_enough_gold = models.CharField(max_length=255)
     minlvl = models.IntegerField(default=0)
-    gm = models.ForeignKey(ObjProto, related_name="guildmaster_of", on_delete=models.PROTECT)
+    gm = models.IntegerField(default=0)
     with_who = models.JSONField(default=None, null=True)
     time_open = models.IntegerField(default=0)
     time_close = models.IntegerField(default=0)
@@ -80,7 +65,7 @@ class LegacyGuild(models.Model):
 
 class LegacyShop(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="shops")
-    producing = models.ManyToManyField(ObjProto, related_name="produced_at")
+    producing = models.JSONField(null=True)
     profit_buy = models.FloatField(default=1.0)
     profit_sell = models.FloatField(default=1.0)
     trade_types = models.JSONField(null=True)
@@ -90,12 +75,14 @@ class LegacyShop(models.Model):
     missing_cash2 = models.TextField(null=True, blank=True)
     message_buy = models.TextField(null=True, blank=True)
     message_sell = models.TextField(null=True, blank=True)
+    do_not_buy = models.TextField(null=True, blank=True)
     temper = models.IntegerField(default=0)
     shop_flags = models.JSONField(null=True)
-    keeper = models.ForeignKey(MobProto, related_name="shopkeeper_of", on_delete=models.PROTECT)
+    keeper = models.IntegerField(default=0)
     with_who = models.JSONField(default=None, null=True)
     time_open1 = models.IntegerField(default=0)
     time_close1 = models.IntegerField(default=0)
     time_open2 = models.IntegerField(default=0)
     time_close2 = models.IntegerField(default=0)
     bank_account = models.BooleanField(default=False)
+    in_room = models.JSONField(null=True)

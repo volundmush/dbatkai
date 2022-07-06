@@ -16,6 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 from commands.account_admin import CmdLegacyImport
+from commands.characters import power as p, system as s
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -35,6 +36,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        self.add(p.Transform)
+        self.add(s.ClearQueue)
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

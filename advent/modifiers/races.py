@@ -1,15 +1,20 @@
 from .base import Modifier as _BaseMod
-
+from advent.typing import Size
+from . import transformations as t
+import typing
 
 class _Race(_BaseMod):
     category = "Race"
     pc_ok = True
     mimic_ok = True
     seeming_ok = True
-    size = -1
+    size = Size.MEDIUM
     abbr = "--"
     has_seeming = False
     rpp_cost = 0
+
+    def get_available_transformations(self, obj) -> list[typing.Type[t._Form]]:
+        return []
 
 
 class Human(_Race):
@@ -21,6 +26,12 @@ class Saiyan(_Race):
     mod_id = 1
     abbr = "Sai"
     rpp_cost = 65
+
+    def get_available_transformations(self, obj) -> list[typing.Type[t._Form]]:
+        if obj.player_flags.has("LegendarySSJ"):
+            return [t.SuperSaiyan, t.LegendarySuperSaiyan]
+        else:
+            return [t.SuperSaiyan, t.SuperSaiyan2, t.SuperSaiyan3, t.SuperSaiyan4]
 
 
 class Icer(_Race):
@@ -52,6 +63,9 @@ class Halfbreed(_Race):
     mod_id = 7
     abbr = "H-B"
 
+    def get_available_transformations(self, obj) -> list[typing.Type[t._Form]]:
+        return [t.HBSuperSaiyan, t.HBSuperSaiyan2, t.HBSuperSaiyan3]
+
 
 class BioAndroid(_Race):
     mod_id = 8
@@ -82,7 +96,7 @@ class Kai(_Race):
 
 class Tuffle(_Race):
     mod_id = 13
-    size = 4
+    size = Size.SMALL
     abbr = "Tuf"
 
 
@@ -112,7 +126,7 @@ class Animal(_NPC):
 class Saiba(_NPC):
     mod_id = 16
     abbr = "Sab"
-    size = 6
+    size = Size.LARGE
 
 
 class Serpent(_NPC):
@@ -123,7 +137,7 @@ class Serpent(_NPC):
 class Ogre(_NPC):
     mod_id = 18
     abbr = "Ogr"
-    size = 6
+    size = Size.LARGE
 
 
 class Yardratian(_NPC):

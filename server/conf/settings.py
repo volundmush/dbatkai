@@ -67,5 +67,18 @@ MODIFIER_PATHS = [
     "advent.modifiers.zone_flags",
     "advent.modifiers.genomes",
     "advent.modifiers.mutations",
-    "advent.modifiers.android"
+    "advent.modifiers.android",
+    "advent.modifiers.transformations"
 ]
+
+BASE_CHARACTER_TYPECLASS = "typeclasses.characters.PlayerCharacter"
+
+
+MULTISESSION_MODE = 3
+# The maximum number of characters allowed by the default ooc char-creation command
+MAX_NR_CHARACTERS = 10
+
+
+SERVER_SESSION_CLASS = "advent.serversession.AdventSession"
+
+CMD_IGNORE_PREFIXES = ""

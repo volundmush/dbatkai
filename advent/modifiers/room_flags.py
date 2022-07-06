@@ -4,6 +4,7 @@ from .base import Modifier as _BaseMod
 class _RoomFlag(_BaseMod):
     category = "RoomFlags"
     mod_id = -1
+    planet = False
 
 
 class Dark(_RoomFlag):
@@ -91,22 +92,27 @@ class TimedDeathtrap(_RoomFlag):
 
 class Earth(_RoomFlag):
     mod_id = 20
+    planet = True
 
 
 class Vegeta(_RoomFlag):
     mod_id = 21
+    planet = True
 
 
 class Frigid(_RoomFlag):
     mod_id = 22
+    planet = True
 
 
 class Konack(_RoomFlag):
     mod_id = 23
+    planet = True
 
 
 class Namek(_RoomFlag):
     mod_id = 24
+    planet = True
 
 
 class Neo(_RoomFlag):
@@ -139,6 +145,7 @@ class GravityX10(_RoomFlag):
 
 class Aether(_RoomFlag):
     mod_id = 32
+    planet = True
 
 
 class HBTC(_RoomFlag):
@@ -159,14 +166,17 @@ class Ship(_RoomFlag):
 
 class Yardrat(_RoomFlag):
     mod_id = 37
+    planet = True
 
 
 class Kanassa(_RoomFlag):
     mod_id = 38
+    planet = True
 
 
 class Arlia(_RoomFlag):
     mod_id = 39
+    planet = True
 
 
 class Aura(_RoomFlag):
@@ -231,6 +241,7 @@ class Star(_RoomFlag):
 
 class Cerria(_RoomFlag):
     mod_id = 55
+    planet = True
 
 
 class CerriaOrbit(_RoomFlag):

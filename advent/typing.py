@@ -73,3 +73,54 @@ class ExitDir(IntEnum):
                 return "O"
             case _:
                 return "--"
+
+
+class Size(IntEnum):
+    UNDEFINED = -1
+    FINE = 0
+    DIMINUTIVE = 1
+    TINY = 2
+    SMALL = 3
+    MEDIUM = 4
+    LARGE = 5
+    HUGE = 6
+    GARGANTUAN = 7
+    COLOSSAL = 8
+
+
+class Sex(IntEnum):
+    NEUTER = 0
+    MALE = 1
+    FEMALE = 2
+
+    def get_vars(self, var_dict: dict, prefix: str):
+        match self:
+            case Sex.NEUTER:
+                for suffix, term in (("subj", "they"), ("obj", "them"), ("poss", "their")):
+                    var_dict[f"{prefix}_{suffix}"] = term
+                    var_dict[f"{prefix}_{suffix.capitalize()}"] = term.capitalize()
+                    var_dict[f"{prefix}_{suffix.upper()}"] = term.upper()
+
+            case Sex.MALE:
+                for suffix, term in (("subj", "he"), ("obj", "him"), ("poss", "his")):
+                    var_dict[f"{prefix}_{suffix}"] = term
+                    var_dict[f"{prefix}_{suffix.capitalize()}"] = term.capitalize()
+                    var_dict[f"{prefix}_{suffix.upper()}"] = term.upper()
+
+            case Sex.FEMALE:
+                for suffix, term in (("subj", "she"), ("obj", "her"), ("poss", "hers")):
+                    var_dict[f"{prefix}_{suffix}"] = term
+                    var_dict[f"{prefix}_{suffix.capitalize()}"] = term.capitalize()
+                    var_dict[f"{prefix}_{suffix.upper()}"] = term.upper()
+
+
+class Position(IntEnum):
+    DEAD = 0
+    MORTALLY_WOUNDED = 1
+    INCAPACITATED = 2
+    STUNNED = 3
+    SLEEPING = 4
+    RESTING = 5
+    SITTING = 6
+    FIGHTING = 7
+    STANDING = 8

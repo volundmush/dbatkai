@@ -30,3 +30,9 @@ class Modifier:
 
     def provides_gravity_tolerance(self, obj) -> int:
         return 0
+
+    def stat_multiplier(self, obj, stat_name) -> float:
+        return 0.0
+
+    def stat_bonus(self, obj, stat_name) -> int:
+        return 0

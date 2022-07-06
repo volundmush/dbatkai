@@ -35,4 +35,5 @@ class Exit(DefaultExit):
                                         defined, in which case that will simply be echoed.
     """
 
-    pass
+    def get_room_description(self, looker=None, **kwargs):
+        return self.get_display_name(looker=looker, **kwargs)

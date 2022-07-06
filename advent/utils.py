@@ -6,6 +6,11 @@ import yaml
 import json
 
 from pathlib import Path
+from evennia.utils.ansi import parse_ansi, ANSIString
+from rich.ansi import AnsiDecoder
+from rich.console import group
+
+from collections import defaultdict
 
 
 def read_json_file(p: Path):
@@ -53,11 +58,13 @@ def partial_match(
         Any or None.
     """
     candidate_list = sorted(candidates, key=lambda item: len(key(item)))
+    mlow = match_text.lower()
     for candidate in candidate_list:
-        if match_text.lower() == key(candidate).lower():
+        can_lower = key(candidate).lower()
+        if mlow == can_lower:
             return candidate
         if not exact:
-            if key(candidate).lower().startswith(match_text.lower()):
+            if can_lower.startswith(mlow):
                 return candidate
 
 
@@ -67,3 +74,29 @@ def generate_name(prefix: str, existing, gen_length: int = 20) -> str:
 
     while (u := gen()) not in existing:
         return u
+
+
+@group()
+def ev_to_rich(s: str):
+    if isinstance(s, ANSIString):
+        for line in AnsiDecoder().decode(str(s)):
+            yield line
+    else:
+        ev = parse_ansi(s, xterm256=True, mxp=True)
+        for line in AnsiDecoder().decode(ev):
+            yield line
+
+
+def echo_action(template: str, actors: dict[str, "DefaultObject"], viewers: typing.Iterable["DefaultObject"], **kwargs):
+
+    for viewer in viewers:
+        var_dict = defaultdict(lambda: "!ERR!")
+        var_dict.update(kwargs)
+        for k, v in actors.items():
+            v.get_template_vars(var_dict, k, looker=viewer)
+
+        viewer.msg(text=ev_to_rich(template.format_map(var_dict)))
+
+
+def iequals(first: str, second: str):
+    return str(first).lower() == str(second).lower()
