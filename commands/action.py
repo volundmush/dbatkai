@@ -1,13 +1,9 @@
-from commands.command import Command
+from athanor.commands.queue import QueueCommand
 from advent.typing import Position
 
 
-class ActionCommand(Command):
+class ActionCommand(QueueCommand):
     min_position = Position.DEAD
-
-    def at_pre_cmd(self):
-        self.caller.cmdqueue.add(self)
-        return True
 
     def can_perform_command(self):
         if not self.caller.is_npc():
@@ -19,20 +15,15 @@ class ActionCommand(Command):
                 return False
 
         pos = self.caller.position.get()
-        if pos.mod_id < int(self.min_position):
+        if pos.modifier_id < int(self.min_position):
             self.msg(pos.incap_message)
             return False
 
         return True
 
-    def func(self):
-        self.msg("Sorry, this command hasn't been implemented yet.")
-
     def act(self, text=None, mapping=None, **kwargs):
         if self.caller.location:
             self.caller.location.msg_contents(text=text, exclude=[self.caller], from_obj=self.caller, mapping=mapping, **kwargs)
-
-
 
 
 class FightCommand(ActionCommand):

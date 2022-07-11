@@ -1,6 +1,6 @@
-from commands.characters.base import FightCommand
-from advent.typing import Position
-from advent.utils import partial_match, iequals, echo_action
+from commands.command import Command
+from commands.action import FightCommand
+from advent.utils import partial_match, iequals
 
 
 class Transform(FightCommand):

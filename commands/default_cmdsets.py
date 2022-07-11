@@ -14,9 +14,11 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 """
 
-from evennia import default_cmds
+from athanor.commands import cmdsets as default_cmds
+from evennia.contrib.rpg.rpsystem import RPSystemCmdSet
 from commands.account_admin import CmdLegacyImport
-from commands.characters import power as p, system as s
+
+from commands import characters as c
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -36,8 +38,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
-        self.add(p.Transform)
-        self.add(s.ClearQueue)
+        self.add(c.Transform)
+        self.add(RPSystemCmdSet)
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
@@ -86,6 +88,23 @@ class SessionCmdSet(default_cmds.SessionCmdSet):
     """
 
     key = "DefaultSession"
+
+    def at_cmdset_creation(self):
+        """
+        This is the only method defined in a cmdset, called during
+        its creation. It should populate the set with command instances.
+
+        As and example we just add the empty base `Command` object.
+        It prints some info.
+        """
+        super().at_cmdset_creation()
+        #
+        # any commands you add below will overload the default ones.
+        #
+
+
+class PlayCmdSet(default_cmds.PlayCmdSet):
+    key = "DefaultPlay"
 
     def at_cmdset_creation(self):
         """

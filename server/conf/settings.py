@@ -25,7 +25,7 @@ put secret game- or server-specific settings in secret_settings.py.
 """
 
 # Use the defaults from Evennia unless explicitly overridden
-from evennia.settings_default import *
+from athanor.settings import *
 
 ######################################################################
 # Evennia base server config
@@ -45,11 +45,11 @@ except ImportError:
 
 
 INSTALLED_APPS.extend([
-    "advent.db.legacy"
+    "advent.legacy",
 ])
 
 
-MODIFIER_PATHS = [
+MODIFIER_PATHS.extend([
     "advent.modifiers.admin_flags",
     "advent.modifiers.affects",
     "advent.modifiers.bonuses",
@@ -69,16 +69,10 @@ MODIFIER_PATHS = [
     "advent.modifiers.mutations",
     "advent.modifiers.android",
     "advent.modifiers.transformations"
-]
+])
 
 BASE_CHARACTER_TYPECLASS = "typeclasses.characters.PlayerCharacter"
 
-
-MULTISESSION_MODE = 3
-# The maximum number of characters allowed by the default ooc char-creation command
-MAX_NR_CHARACTERS = 10
-
-
-SERVER_SESSION_CLASS = "advent.serversession.AdventSession"
-
-CMD_IGNORE_PREFIXES = ""
+SYSTEMS.extend([
+    "advent.systems.ZoneSystem",
+])

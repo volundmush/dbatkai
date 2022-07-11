@@ -1,4 +1,5 @@
-from advent.db.legacy.models import Zone, ResetCommand, DgScript, LegacyRoom, LegacyShop, LegacyGuild
+from athanor.dgscripts.dgscripts import DefaultDGScript
+from advent.legacy.models import Zone, LegacyRoom, LegacyShop, LegacyGuild
 from advent.utils import read_json_file
 from typeclasses.rooms import Room
 from typeclasses.exits import Exit
@@ -11,7 +12,8 @@ from pathlib import Path
 
 _email = EmailValidator()
 
-from advent.typing import ExitDir, Size, Sex
+from athanor.typing import ExitDir
+from advent.typing import Size, Sex
 from mudrich.circle import CircleToEvennia
 from evennia.utils.ansi import strip_ansi
 
@@ -30,7 +32,8 @@ class Importer:
         self.majin_map = dict()
         proto_file = Path("world") / "prototypes.py"
         self.proto_file = open(proto_file, mode="a")
-        self.proto_file.write("from advent.typing import Size, Sex, ExitDir\n\n")
+        self.proto_file.write("from athanor.typing import ExitDir\n")
+        self.proto_file.write("from advent.typing import Size, Sex\n\n")
 
     def msg(self, txt):
         self.caller.msg(txt)
@@ -329,7 +332,6 @@ class Importer:
 
         return count
 
-
     def load_dgscripts(self):
         zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
 
@@ -347,11 +349,15 @@ class Importer:
             for j in rj:
                 vnum = j["HasVnum"]["vnum"]
                 dj = j.pop("DgScriptProto")
-                dj["id"] = vnum
-                dj["name"] = strip_ansi(CircleToEvennia(j.pop("Name", f"Script {vnum}")))
+                dj["key"] = strip_ansi(CircleToEvennia(j.pop("Name", f"Script {vnum}")))
                 dj["lines"] = dj.pop("cmdlist", list())
 
-                zone.dgscript_prototypes.create(**dj)
+                final = {f"db_{k}": v for k, v in dj.items()}
+                final["id"] = vnum
+
+                new_script = DefaultDGScript(**final)
+                new_script.save()
+                new_script.db.zone = zone
 
     def load_shops(self):
         zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
@@ -480,6 +486,7 @@ class Importer:
                             ex, err = Exit.create(e_dir.name.lower(), source, dest.obj, attributes=attributes)
                             if err:
                                 self.msg(err)
+                            ex.db.direction = int(e_dir)
                             exit_total += 1
                             match e_dir:
                                 case ExitDir.NORTH | ExitDir.EAST | ExitDir.SOUTH | ExitDir.WEST | ExitDir.UP | ExitDir.DOWN:
@@ -505,7 +512,7 @@ class Importer:
 
         self.msg("Importing DgScripts...")
         self.load_dgscripts()
-        self.msg(f"Imported {DgScript.objects.count()} DgScripts!")
+        self.msg(f"Imported {DefaultDGScript.objects.count()} DgScripts!")
 
         self.msg("Importing Rooms...")
         self.load_rooms()

@@ -32,18 +32,6 @@ class ResetCommand(models.Model):
         unique_together = (("zone", "line"),)
 
 
-class DgScript(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="dgscript_prototypes")
-    name = models.CharField(max_length=100)
-    color_name = models.CharField(max_length=150)
-    attach_type = models.IntegerField(default=0)
-    trigger_type = models.JSONField(null=True)
-    data_type = models.IntegerField(default=0)
-    narg = models.SmallIntegerField(default=0)
-    arglist = models.CharField(max_length=255)
-    lines = models.JSONField()
-
-
 class LegacyRoom(models.Model):
     zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="rooms")
     obj = models.OneToOneField("objects.ObjectDB", related_name="legacy_room", on_delete=models.PROTECT)

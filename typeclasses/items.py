@@ -1,11 +1,11 @@
-from .objects import Object
+from athanor.typeclasses.items import AthanorItem
 from evennia.utils.utils import lazy_property
-from advent.handlers.basic import FlagsHandler, FlagHandler
+from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
 from evennia.utils.ansi import ANSIString
 
 
-class Item(GameObj, Object):
+class Item(GameObj, AthanorItem):
 
     @lazy_property
     def item_flags(self):

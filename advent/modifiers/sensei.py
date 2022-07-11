@@ -3,7 +3,7 @@ from .base import Modifier as _BaseMod
 
 class _Sensei(_BaseMod):
     category = "Sensei"
-    mod_id = -1
+    modifier_id = -1
     pc_ok = False
     abbr = "--"
     arts_name = "Like a Bum"
@@ -18,7 +18,7 @@ class _Sensei(_BaseMod):
 
 
 class Commoner(_Sensei):
-    mod_id = 255
+    modifier_id = 255
 
 
 class _PC(_Sensei):
@@ -31,7 +31,7 @@ class _PC(_Sensei):
 
 
 class Roshi(_PC):
-    mod_id = 0
+    modifier_id = 0
     abbr = "Ro"
     arts_name = "Kame Arts"
     location = 1131
@@ -39,7 +39,7 @@ class Roshi(_PC):
 
 
 class Piccolo(_PC):
-    mod_id = 1
+    modifier_id = 1
     abbr = "Pi"
     arts_name = "Demon Taijutsu"
     location = 1662
@@ -47,7 +47,7 @@ class Piccolo(_PC):
 
 
 class Krane(_PC):
-    mod_id = 2
+    modifier_id = 2
     abbr = "Kr"
     arts_name = "Crane Arts"
     location = 13012
@@ -55,7 +55,7 @@ class Krane(_PC):
 
 
 class Nail(_PC):
-    mod_id = 3
+    modifier_id = 3
     abbr = "Na"
     arts_name = "Tranquil Palm"
     location = 11683
@@ -63,7 +63,7 @@ class Nail(_PC):
 
 
 class Bardock(_PC):
-    mod_id = 4
+    modifier_id = 4
     abbr = "Ba"
     arts_name = "Brutal Beast"
     location = 2267
@@ -74,7 +74,7 @@ class Bardock(_PC):
 
 
 class Ginyu(_PC):
-    mod_id = 5
+    modifier_id = 5
     abbr = "Gi"
     arts_name = "Flaunted Style"
     location = 4290
@@ -82,7 +82,7 @@ class Ginyu(_PC):
 
 
 class Frieza(_PC):
-    mod_id = 6
+    modifier_id = 6
     abbr = "Fr"
     arts_name = "Frozen Fist"
     location = 4283
@@ -90,7 +90,7 @@ class Frieza(_PC):
 
 
 class Tapion(_PC):
-    mod_id = 7
+    modifier_id = 7
     abbr = "Ta"
     arts_name = "Shadow Grappling"
     location = 8233
@@ -98,7 +98,7 @@ class Tapion(_PC):
 
 
 class Sixteen(_PC):
-    mod_id = 8
+    modifier_id = 8
     abbr = "16"
     arts_name = "Iron Hand"
     location = 1714
@@ -111,7 +111,7 @@ class Sixteen(_PC):
 
 
 class Dabura(_PC):
-    mod_id = 9
+    modifier_id = 9
     abbr = "Da"
     arts_name = "Devil Dance"
     location = 6487
@@ -124,7 +124,7 @@ class Dabura(_PC):
 
 
 class Kibito(_PC):
-    mod_id = 10
+    modifier_id = 10
     abbr = "Ki"
     arts_name = "Gentle Fist"
     location = 12098
@@ -139,7 +139,7 @@ class Kibito(_PC):
 
 
 class Jinto(_PC):
-    mod_id = 11
+    modifier_id = 11
     abbr = "Ji"
     arts_name = "Star's Radiance"
     location = 3499
@@ -152,7 +152,7 @@ class Jinto(_PC):
 
 
 class Tsuna(_PC):
-    mod_id = 12
+    modifier_id = 12
     abbr = "Ts"
     arts_name = "Sacred Tsunami"
     location = 15009
@@ -165,7 +165,7 @@ class Tsuna(_PC):
 
 
 class Kurzak(_PC):
-    mod_id = 13
+    modifier_id = 13
     abbr = "Ku"
     arts_name = "Adaptive Taijutsu"
     location = 16100

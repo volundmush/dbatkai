@@ -21,11 +21,12 @@ possibility to connect with a guest account. The setting file accepts
 several more options for customizing the Guest account system.
 
 """
+from django.conf import settings
+from athanor.typeclasses.accounts import AthanorAccount
+from evennia import DefaultGuest
 
-from evennia import DefaultAccount, DefaultGuest
 
-
-class Account(DefaultAccount):
+class Account(AthanorAccount):
     """
     This class describes the actual OOC account (i.e. the user connecting
     to the MUD). It does NOT have visual appearance in the game world (that
@@ -91,7 +92,6 @@ class Account(DefaultAccount):
      at_server_shutdown()
 
     """
-
     pass
 
 

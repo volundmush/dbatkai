@@ -7,15 +7,16 @@ is setup to be the "default" character type created by the default
 creation commands.
 
 """
+from athanor.typeclasses.characters import AthanorCharacter
 from evennia.contrib.rpg.rpsystem import ContribRPCharacter
 from evennia.utils.utils import lazy_property
-from advent.handlers.basic import FlagsHandler, FlagHandler
+from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
-from advent.handlers.characters import PercentHandler, PowerStatHandler, PowerLevelHandler, StatHandler, \
+from advent.handlers import PercentHandler, PowerStatHandler, PowerLevelHandler, StatHandler, \
     CharacterSizeHandler, PromptHandler
 
 
-class Character(GameObj, ContribRPCharacter):
+class Character(GameObj, ContribRPCharacter, AthanorCharacter):
     """
     The Character defaults to reimplementing some of base Object's hook methods with the
     following functionality:
@@ -204,7 +205,6 @@ class Character(GameObj, ContribRPCharacter):
         build_string.append(self.get_posed_sdesc(sdesc) if kwargs.get("pose", False) else sdesc)
         return " ".join(build_string)
 
-
     def get_sdesc(self, obj, process=False, **kwargs):
         if obj.is_npc():
             return obj.db.color_name or obj.key
@@ -218,11 +218,6 @@ class NonPlayerCharacter(Character):
         if self.db.mobile_vnum:
             return f"|g[I-{self.db.mobile_vnum}]|n"
         return None
-
-    def get_sdesc(self, obj, process=False, **kwargs):
-        sdesc = self.db.color_name or self.key
-        print(f"{self} returning: {sdesc}")
-        return sdesc
 
     def get_posed_sdesc(self, sdesc, **kwargs):
         """

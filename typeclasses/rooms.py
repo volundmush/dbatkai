@@ -5,9 +5,9 @@ Rooms are simple containers that has no location of their own.
 
 """
 
-from evennia import DefaultRoom
+from athanor.typeclasses.rooms import AthanorRoom
 from evennia.utils.utils import lazy_property, list_to_string
-from advent.handlers.basic import FlagsHandler, FlagHandler
+from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
 from evennia.utils.ansi import ANSIString
 from collections import defaultdict
@@ -18,7 +18,7 @@ from rich.text import Text
 from rich.style import NULL_STYLE
 
 from advent.utils import ev_to_rich
-from advent import MODIFIERS_NAMES
+from athanor import MODIFIERS_NAMES
 
 COMPASS_TEMPLATE = """||{N:^3}||
 ||{NW:>3}|| ||{U:^3}|| ||{NE:<3}||
@@ -28,7 +28,7 @@ COMPASS_TEMPLATE = """||{N:^3}||
 """
 
 
-class Room(GameObj, DefaultRoom):
+class Room(GameObj, AthanorRoom):
     """
     Rooms are like any Object, except their location is None
     (which is default). They also use basetype_setup() to
@@ -151,15 +151,14 @@ class Room(GameObj, DefaultRoom):
 
     @group()
     def return_appearance(self, looker, **kwargs):
-        builder = False
+
+        if not looker:
+            return ""
 
         def gen_name(obj):
             return obj.get_display_name(looker=looker, pose=True, **kwargs)
 
-        if not looker:
-            return ""
-        else:
-            builder = self.locks.check_lockstring(looker, "perm(Builder)")
+        builder = self.locks.check_lockstring(looker, "perm(Builder)")
 
         yield self.header_line
 
@@ -187,7 +186,7 @@ class Room(GameObj, DefaultRoom):
         col_automap = ev_to_rich("\r\n".join(["".join([automap[y][x] for x in x_coor]) for y in y_coor]))
 
         map_legend = [f"{x.map_key}: {x.get_map_name()}" for x in
-                      sorted(MODIFIERS_NAMES["SectorType"].values(), key=lambda y: y.mod_id)]
+                      sorted(MODIFIERS_NAMES["SectorType"].values(), key=lambda y: y.modifier_id)]
         map_legend.append("|rX|n: You")
 
         table = Table(box=None)
@@ -217,3 +216,6 @@ class Room(GameObj, DefaultRoom):
         if hasattr(self, "legacy_room"):
             return f"|g[R-{self.legacy_room.id}]|n"
         return None
+
+    def at_zone_reset(self):
+        pass

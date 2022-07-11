@@ -10,11 +10,11 @@ the other types, you can do so by adding this as a multiple
 inheritance.
 
 """
-from evennia import DefaultObject
+from athanor.typeclasses.objects import AthanorObject
+from .mixins import GameObj
 
 
-
-class Object(DefaultObject):
+class Object(GameObj, AthanorObject):
     """
     This is the root typeclass object, implementing an in-game Evennia
     game object, such as having a location, being able to be

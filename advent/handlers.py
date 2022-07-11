@@ -1,7 +1,26 @@
 from evennia.utils.utils import lazy_property
-from .basic import SizeHandler, FlagHandler
+from athanor.modifiers import FlagHandler
 from advent.typing import Size
 import typing
+
+
+class SizeHandler:
+    attr_name = "size"
+
+    def __init__(self, owner, default: Size = Size.MEDIUM):
+        self.owner = owner
+        self.data = owner.attributes.get(self.attr_name, default)
+
+    def get(self) -> Size:
+        return self.data
+
+    def set(self, value: typing.Union[Size, int]):
+        self.data = Size(value)
+        self.owner.attributes.add(self.attr_name, self.data)
+
+
+class ExDescription:
+    attr_name = "ex_descriptions"
 
 
 class PercentHandler:

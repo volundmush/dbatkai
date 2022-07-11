@@ -3,81 +3,81 @@ from .base import Modifier as _BaseMod
 
 class _WearFlag(_BaseMod):
     category = "WearFlags"
-    mod_id = -1
+    modifier_id = -1
 
 
 
 class Take(_WearFlag):
-    mod_id = 0
+    modifier_id = 0
 
 
 class Finger(_WearFlag):
-    mod_id = 1
+    modifier_id = 1
 
 
 class Neck(_WearFlag):
-    mod_id = 2
+    modifier_id = 2
 
 
 class Body(_WearFlag):
-    mod_id = 3
+    modifier_id = 3
 
 
 class Head(_WearFlag):
-    mod_id = 4
+    modifier_id = 4
 
 
 class Legs(_WearFlag):
-    mod_id = 5
+    modifier_id = 5
 
 
 class Feet(_WearFlag):
-    mod_id = 6
+    modifier_id = 6
 
 
 class Hands(_WearFlag):
-    mod_id = 7
+    modifier_id = 7
 
 
 class Arms(_WearFlag):
-    mod_id = 8
+    modifier_id = 8
 
 
 class Shield(_WearFlag):
-    mod_id = 9
+    modifier_id = 9
 
 
 class About(_WearFlag):
-    mod_id = 10
+    modifier_id = 10
 
 
 class Waist(_WearFlag):
-    mod_id = 11
+    modifier_id = 11
 
 
 class Wrist(_WearFlag):
-    mod_id = 12
+    modifier_id = 12
 
 
 class Wield(_WearFlag):
-    mod_id = 13
+    modifier_id = 13
 
 
 class Hold(_WearFlag):
-    mod_id = 14
+    modifier_id = 14
 
 
 class Pack(_WearFlag):
-    mod_id = 15
+    modifier_id = 15
 
 
 class Ear(_WearFlag):
-    mod_id = 16
+    modifier_id = 16
 
 
 class Wings(_WearFlag):
-    mod_id = 17
+    modifier_id = 17
 
 
 class Eye(_WearFlag):
-    mod_id = 18
+    modifier_id = 18

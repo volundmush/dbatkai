@@ -1,6 +1,6 @@
 from evennia.commands.default.muxcommand import MuxAccountCommand
 from pathlib import Path
-from advent.legacy import Importer
+from advent.legacy.legacy import Importer
 
 
 class CmdLegacyImport(MuxAccountCommand):
@@ -21,7 +21,6 @@ class CmdLegacyImport(MuxAccountCommand):
         if not (a_path.exists() and a_path.is_dir()):
             self.msg("No accounts folder. This isn't a legacy folder.")
             return
-
 
         i = Importer(self.caller, p)
         self.caller.importer = i
