@@ -1,21 +1,24 @@
 from django.db import models
+from django.conf import settings
+from evennia.typeclasses.models import TypedObject, SharedMemoryModel
 
 
-class Zone(models.Model):
-    name = models.CharField(max_length=100)
-    color_name = models.CharField(max_length=150)
-    legacy_builders = models.TextField()
-    lifespan = models.IntegerField(default=0)
-    age = models.IntegerField(default=0)
-    start_vnum = models.IntegerField(default=0)
-    end_vnum = models.IntegerField(default=0)
-    reset_mode = models.SmallIntegerField(default=0)
-    min_level = models.IntegerField(default=0)
-    max_level = models.IntegerField(default=0)
+class ZoneDB(TypedObject):
+    __settingsclasspath__ = settings.BASE_ZONE_TYPECLASS
+    __defaultclasspath__ = "advent.legacy.zones.DefaultZone"
+    __applabel__ = "legacy"
+
+    db_lifespan = models.IntegerField(default=0)
+    db_reset_countdown = models.FloatField(default=0)
+    db_start_vnum = models.IntegerField(default=0)
+    db_end_vnum = models.IntegerField(default=0)
+    db_reset_mode = models.SmallIntegerField(default=0)
+    db_min_level = models.IntegerField(default=0)
+    db_max_level = models.IntegerField(default=0)
 
 
 class ResetCommand(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="commands")
+    zone = models.ForeignKey(ZoneDB, on_delete=models.CASCADE, related_name="commands")
     line = models.IntegerField(default=0)
 
     command = models.CharField(max_length=1, null=False, blank=False)
@@ -33,12 +36,12 @@ class ResetCommand(models.Model):
 
 
 class LegacyRoom(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="rooms")
+    zone = models.ForeignKey(ZoneDB, on_delete=models.CASCADE, related_name="rooms")
     obj = models.OneToOneField("objects.ObjectDB", related_name="legacy_room", on_delete=models.PROTECT)
 
 
 class LegacyGuild(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="guilds")
+    zone = models.ForeignKey(ZoneDB, on_delete=models.CASCADE, related_name="guilds")
     skills = models.JSONField(default=None, null=True)
     feats = models.JSONField(default=None, null=True)
     charge = models.FloatField(default=1.0)
@@ -52,7 +55,7 @@ class LegacyGuild(models.Model):
 
 
 class LegacyShop(models.Model):
-    zone = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name="shops")
+    zone = models.ForeignKey(ZoneDB, on_delete=models.CASCADE, related_name="shops")
     producing = models.JSONField(null=True)
     profit_buy = models.FloatField(default=1.0)
     profit_sell = models.FloatField(default=1.0)

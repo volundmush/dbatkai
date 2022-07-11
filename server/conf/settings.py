@@ -73,6 +73,10 @@ MODIFIER_PATHS.extend([
 
 BASE_CHARACTER_TYPECLASS = "typeclasses.characters.PlayerCharacter"
 
+BASE_ZONE_TYPECLASS = "advent.legacy.zones.DefaultZone"
+
 SYSTEMS.extend([
     "advent.systems.ZoneSystem",
 ])
+
+MAX_NR_CHARACTERS = 10

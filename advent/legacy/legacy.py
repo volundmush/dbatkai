@@ -1,5 +1,6 @@
 from athanor.dgscripts.dgscripts import DefaultDGScript
-from advent.legacy.models import Zone, LegacyRoom, LegacyShop, LegacyGuild
+from advent.legacy.models import LegacyRoom, LegacyShop, LegacyGuild
+from advent.legacy.zones import DefaultZone
 from advent.utils import read_json_file
 from typeclasses.rooms import Room
 from typeclasses.exits import Exit
@@ -201,28 +202,34 @@ class Importer:
                 continue
 
             data = {}
-            data["id"] = j["HasVnum"]["vnum"]
+            cdict = {}
+            cdict["id"] = j["HasVnum"]["vnum"]
 
             data["color_name"] = CircleToEvennia(j.pop("Name", "Nameless Zone"))
-            data["name"] = strip_ansi(data["color_name"])
-            self.msg(f"Loading Zone {data['id']}: {data['name']}")
+            cdict["db_key"] = strip_ansi(data["color_name"])
+
+            self.msg(f"Loading Zone {cdict['id']}: {cdict['db_key']}")
+
             z = j["Zone"]
             if "lifespan" in z:
-                data["lifespan"] = z["lifespan"]
+                cdict["db_lifespan"] = z["lifespan"]
 
-            data["start_vnum"] = z["bot"]
-            data["end_vnum"] = z["top"]
-
-            if "age" in z:
-                data["age"] = z["age"]
+            cdict["db_start_vnum"] = z["bot"]
+            cdict["db_end_vnum"] = z["top"]
 
             if "legacy_builders" in z:
                 data["legacy_builders"] = z["legacy_builders"]
 
             if "reset_mode" in z:
-                data["reset_mode"] = z["reset_mode"]
+                cdict["db_reset_mode"] = z["reset_mode"]
 
-            zone = Zone.objects.create(**data)
+            zone = DefaultZone.objects.create(**cdict)
+            zone.save()
+            for k, v in data.items():
+                zone.attributes.add(k, v)
+
+            zone.db.legacy_path = d
+
             self.zone_paths[zone.id] = d
             self.zone_ids[zone.id] = zone
 
@@ -245,7 +252,7 @@ class Importer:
 
         #save_prototype(proto)
         count = 0
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         for zid in zone_ids:
             zone = self.zone_ids[zid]
@@ -296,7 +303,7 @@ class Importer:
         #save_prototype(proto)
         count = 0
 
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         for zid in zone_ids:
             zone = self.zone_ids[zid]
@@ -333,7 +340,7 @@ class Importer:
         return count
 
     def load_dgscripts(self):
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         for zid in zone_ids:
             zone = self.zone_ids[zid]
@@ -360,7 +367,7 @@ class Importer:
                 new_script.db.zone = zone
 
     def load_shops(self):
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         for zid in zone_ids:
             zone = self.zone_ids[zid]
@@ -383,7 +390,7 @@ class Importer:
                 shop = zone.shops.create(**j)
 
     def load_guilds(self):
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         for zid in zone_ids:
             zone = self.zone_ids[zid]
@@ -404,7 +411,7 @@ class Importer:
                 guild = zone.guilds.create(**j)
 
     def load_rooms(self):
-        zone_ids = Zone.objects.all().values_list("id", flat=True).order_by("id")
+        zone_ids = DefaultZone.objects.all().values_list("id", flat=True).order_by("id")
 
         exit_map = defaultdict(dict)
         room_map = dict()
@@ -508,7 +515,7 @@ class Importer:
 
         self.msg("Importing Zones...")
         self.load_zones()
-        self.msg(f"Imported {Zone.objects.count()} Zones!")
+        self.msg(f"Imported {DefaultZone.objects.count()} Zones!")
 
         self.msg("Importing DgScripts...")
         self.load_dgscripts()
