@@ -1,5 +1,6 @@
 from commands.command import Command
-from commands.action import FightCommand
+from commands.action import FightCommand, ActionCommand
+from advent.typing import Position
 from advent.utils import partial_match, iequals
 
 
@@ -41,3 +42,11 @@ class Transform(FightCommand):
 
         self.caller.transform_to(found)
         self.caller.cmdqueue.set_wait(0.5)
+
+
+class Equip(ActionCommand):
+    key = "equipment"
+    aliases = ["eq", "equ", "equip", "equipm", "equipme", "equipmen"]
+
+    def func(self):
+        self.caller.msg(text=self.caller.display_equipment(looker=self.caller, show_empty=True))

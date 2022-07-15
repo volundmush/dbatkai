@@ -1,5 +1,6 @@
 from advent.legacy.zones import DefaultZone
 from athanor.systems import System, sleep_for
+from random import randint
 
 
 class ZoneSystem(System):
@@ -13,10 +14,13 @@ class ZoneSystem(System):
     def at_init(self):
         for z in DefaultZone.objects.all().order_by("id"):
             self.zones[z.id] = z
+            if z.reset_countdown <= 0:
+                z.reset_countdown = randint(5,25)
 
     async def update(self):
         for k, v in self.zones.items():
-            v.db_reset_countdown = v.db_reset_countdown - self.interval
-            if v.db_reset_countdown <= 0:
+            v.reset_countdown = v.reset_countdown - self.interval
+            if v.reset_countdown <= 0:
                 await v.reset()
-                v.db_reset_countdown = v.db_lifespan * 60.0
+                v.reset_countdown = v.lifespan * 60.0
+

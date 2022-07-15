@@ -10,6 +10,7 @@ from collections import defaultdict
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
 from pathlib import Path
+from random import randint
 
 _email = EmailValidator()
 
@@ -222,6 +223,8 @@ class Importer:
 
             if "reset_mode" in z:
                 cdict["db_reset_mode"] = z["reset_mode"]
+
+            cdict["db_reset_countdown"] = randint(5, 25)
 
             zone = DefaultZone.objects.create(**cdict)
             zone.save()

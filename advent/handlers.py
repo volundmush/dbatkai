@@ -85,6 +85,19 @@ class StatHandler:
         return round((self.data + bonus) * mult)
 
 
+class BoundedStatHandler(StatHandler):
+
+    def __init__(self, owner, attr_name, default: int = 1, min_amt: int = 0, max_amt = 100):
+        super().__init__(owner, attr_name, default=default)
+        self.min_amt = min_amt
+        self.max_amt = max_amt
+
+    def set(self, value: int) -> int:
+        self.data = max(min(value, self.max_amt), self.min_amt)
+        self.owner.attributes.add(self.attr_name, self.data)
+        return self.data
+
+
 class PowerStatHandler(StatHandler):
 
     def __init__(self, owner, attr_name: str, percent_name: str, default: int = 1, ):

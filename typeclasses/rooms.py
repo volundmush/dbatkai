@@ -19,6 +19,7 @@ from rich.style import NULL_STYLE
 
 from advent.utils import ev_to_rich
 from athanor import MODIFIERS_NAMES
+from evennia.contrib.rpg.rpsystem import ContribRPRoom
 
 COMPASS_TEMPLATE = """||{N:^3}||
 ||{NW:>3}|| ||{U:^3}|| ||{NE:<3}||
@@ -28,7 +29,7 @@ COMPASS_TEMPLATE = """||{N:^3}||
 """
 
 
-class Room(GameObj, AthanorRoom):
+class Room(GameObj, ContribRPRoom, AthanorRoom):
     """
     Rooms are like any Object, except their location is None
     (which is default). They also use basetype_setup() to

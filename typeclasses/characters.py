@@ -13,7 +13,18 @@ from evennia.utils.utils import lazy_property
 from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
 from advent.handlers import PercentHandler, PowerStatHandler, PowerLevelHandler, StatHandler, \
-    CharacterSizeHandler, PromptHandler
+    CharacterSizeHandler, PromptHandler, BoundedStatHandler
+from advent.utils import INFLECT
+from advent.typing import WearSlot
+
+from rich.console import group
+from rich.table import Table
+from rich.text import Text
+from rich.style import NULL_STYLE
+from athanor.utils import ev_to_rich
+
+from advent.sdesc import PCSdescHandler, PCRecogHandler
+from advent.sdesc import NPCSdescHandler, NPCRecogHandler
 
 
 class Character(GameObj, ContribRPCharacter, AthanorCharacter):
@@ -36,6 +47,7 @@ class Character(GameObj, ContribRPCharacter, AthanorCharacter):
     at_post_puppet - Echoes "AccountName has entered the game" to the room.
 
     """
+
     modifier_attrs = ["sensei", "race", "transformation", "mob_flags", "player_flags",
                       "admin_flags", "affect_flags"]
 
@@ -114,10 +126,6 @@ class Character(GameObj, ContribRPCharacter, AthanorCharacter):
     @lazy_property
     def admin_flags(self):
         return FlagsHandler(self, "admin_flags", "AdminFlags")
-
-    @lazy_property
-    def affect_flags(self):
-        return FlagsHandler(self, "affect_flags", "AffectFlags")
 
     @property
     def gender(self):
@@ -201,16 +209,91 @@ class Character(GameObj, ContribRPCharacter, AthanorCharacter):
                 # use own sdesc as a fallback
                 sdesc = self.sdesc.get()
 
+        sd = self.get_posed_sdesc(sdesc) if kwargs.get("pose", False) else sdesc
         build_string = self.generate_build_string(looker=looker, **kwargs)
-        build_string.append(self.get_posed_sdesc(sdesc) if kwargs.get("pose", False) else sdesc)
+
+        if hasattr(looker, "recog") and not looker.recog.get(self):
+            sd = INFLECT.a(sd).capitalize()
+        build_string.append(sd)
         return " ".join(build_string)
 
     def get_sdesc(self, obj, process=False, **kwargs):
-        if obj.is_npc():
+        if self.is_npc() or obj.is_npc():
             return obj.db.color_name or obj.key
         else:
+            if self.locks.check_lockstring(self, "perm(Builder)"):
+                return obj.key
             return ContribRPCharacter.get_sdesc(self, obj, process=process, **kwargs)
 
+    @group()
+    def display_equipment(self, looker, show_empty=False, **kwargs):
+        def row(s, obj):
+            return ev_to_rich(f"|C<|c{slot.display():<20}|C>|n {obj.get_display_name(looker=looker) if obj else 'Nothing'}")
+
+        for slot in WearSlot:
+            if (eq := self.equipment.get(int(slot))) and looker.can_see(eq):
+                yield row(slot, eq)
+            elif show_empty:
+                yield row(slot, eq)
+
+    @group()
+    def return_appearance(self, looker, **kwargs):
+        if self.db.desc:
+            yield ev_to_rich(self.db.desc)
+            yield "\n"
+
+        yield ev_to_rich("|WPHYS STUFF GOES HERE!|n")
+
+        yield "\n"
+
+        yield ev_to_rich("|wINFO GOES HERE!|n")
+
+        any_eq = False
+        for e in self.equipment.all():
+            if looker.can_see(e):
+                any_eq = True
+                break
+
+        if any_eq:
+            yield "\n"
+            yield ev_to_rich(f"{self.get_display_name(looker=looker)} is using:")
+            yield self.display_equipment(looker, **kwargs)
+
+    @lazy_property
+    def bank_balance(self):
+        return StatHandler(self, "bank_balance", default=0)
+
+    @lazy_property
+    def drunk(self):
+        return BoundedStatHandler(self, "drunk", default=0, min_amt=0, max_amt=100)
+
+    @lazy_property
+    def hunger(self):
+        return BoundedStatHandler(self, "hunger", default=100, min_amt=0, max_amt=100)
+
+    @lazy_property
+    def thirst(self):
+        return BoundedStatHandler(self, "thirst", default=100, min_amt=0, max_amt=100)
+
+    @lazy_property
+    def experience(self):
+        return StatHandler(self, "exp", default=0)
+
+    @lazy_property
+    def zenni(self):
+        return StatHandler(self, "gold", default=0)
+
+    @lazy_property
+    def practices(self):
+        return StatHandler(self, "practices", default=0)
+
+    @lazy_property
+    def sdesc(self):
+        return NPCSdescHandler(self)
+
+    @lazy_property
+    def recog(self):
+        return NPCRecogHandler(self)
 
 class NonPlayerCharacter(Character):
 
@@ -240,3 +323,11 @@ class PlayerCharacter(Character):
 
     def is_npc(self) -> bool:
         return False
+
+    @lazy_property
+    def sdesc(self):
+        return PCSdescHandler(self)
+
+    @lazy_property
+    def recog(self):
+        return PCRecogHandler(self)

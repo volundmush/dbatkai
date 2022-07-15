@@ -4,7 +4,7 @@ from evennia.prototypes.spawner import spawn
 from random import randint
 from athanor.systems import sleep_for
 from advent.legacy.models import LegacyRoom
-
+from evennia import search_tag
 from advent.legacy.models import ZoneDB
 
 
@@ -22,7 +22,7 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
         all_commands = list(self.commands.all().order_by("line"))
 
         for cmd in all_commands:
-            await sleep_for(0.2)
+            await sleep_for(0.05)
             #print(f"Processing Line {cmd.line}: {cmd.command} {cmd.arg1} {cmd.arg2} {cmd.arg3} {cmd.arg4} {cmd.arg5}")
 
             if cmd.if_flag:
@@ -45,7 +45,8 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
                             last_loaded = None
                             continue
 
-                        proto_list = search_prototype(key=f"legacy_mobile_{cmd.arg1}", require_single=True)
+                        proto_key = f"legacy_mobile_{cmd.arg1}"
+                        proto_list = search_prototype(key=proto_key, require_single=True)
                         proto = proto_list[0]
 
                         # Roll the chance dice. if arg5 is 0 this will always succeed.
@@ -54,9 +55,9 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
                             last_loaded = None
                             continue
 
-                        # arg4 is the max amount of mobiles that can be in this room.
+                        # arg4 is the max amount of mobiles that can have loaded with this room as a home.
                         if cmd.arg4 > 0:
-                            total_amount = len([x for x in room.obj.contents if x.db.mobile_vnum == cmd.arg1])
+                            total_amount = search_tag(proto_key, category="from_prototype").filter(db_home=room.obj, db_location__legacy_room__zone__isnull=False).count()
                             if total_amount >= cmd.arg4:
                                 continue
 
@@ -75,7 +76,8 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
                             last_loaded = None
                             continue
 
-                        proto_list = search_prototype(key=f"legacy_item_{cmd.arg1}", require_single=True)
+                        proto_key = f"legacy_item_{cmd.arg1}"
+                        proto_list = search_prototype(key=proto_key, require_single=True)
                         proto = proto_list[0]
 
                         # Roll the chance dice. if arg5 is 0 this will always succeed.
@@ -86,7 +88,7 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
 
                         # arg4 is the max amount of mobiles that can be in this room.
                         if cmd.arg4 > 0:
-                            total_amount = len([x for x in room.obj.contents if x.db.item_vnum == cmd.arg1])
+                            total_amount = search_tag(proto_key, category="from_prototype").filter(db_home=room.obj, db_location=room.obj).count()
                             if total_amount >= cmd.arg4:
                                 continue
 
@@ -163,4 +165,4 @@ class DefaultZone(ZoneDB, metaclass=TypeclassBase):
         for room in self.rooms.all():
             if hasattr(room.obj, "at_zone_reset"):
                 room.obj.at_zone_reset()
-                await sleep_for(0.05)
+                await sleep_for(0.01)

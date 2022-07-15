@@ -3,6 +3,7 @@ from advent.typing import Size
 from . import transformations as t
 import typing
 
+
 class _Race(_BaseMod):
     category = "Race"
     pc_ok = True
@@ -15,6 +16,9 @@ class _Race(_BaseMod):
 
     def get_available_transformations(self, obj) -> list[typing.Type[t._Form]]:
         return []
+
+    def generate_sdesc(self) -> str:
+        return f"{self.owner.gender} {self.get_name().lower()}"
 
 
 class Human(_Race):
@@ -47,6 +51,9 @@ class Konatsu(_Race):
 class Namekian(_Race):
     modifier_id = 4
     abbr = "Nam"
+
+    def generate_sdesc(self) -> str:
+        return f"{self.get_name().lower()}"
 
 
 class Mutant(_Race):

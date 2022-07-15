@@ -3,6 +3,8 @@ from evennia.utils.utils import lazy_property
 from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
 from evennia.utils.ansi import ANSIString
+from advent.handlers import StatHandler
+from evennia.contrib.rpg.rpsystem import ContribRPObject
 
 
 class Item(GameObj, AthanorItem):
@@ -23,3 +25,11 @@ class Item(GameObj, AthanorItem):
         if self.db.item_vnum:
             return f"|g[I-{self.db.item_vnum}]|n"
         return None
+
+    @lazy_property
+    def price(self):
+        return StatHandler(self, "price", default=0)
+
+    @lazy_property
+    def price_per_day(self):
+        return StatHandler(self, "price_per_day", default=0)
