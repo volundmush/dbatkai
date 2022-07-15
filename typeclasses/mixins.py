@@ -139,6 +139,32 @@ class GameObj:
     def is_illuminated(self) -> bool:
         return True
 
+    def can_see_here(self) -> bool:
+        if self.location:
+            return True
+
+    def filter_visible(self, candidates):
+        return [c for c in candidates if self.can_see(c)]
+
+    def get_visible_nearby(self, obj_type=None):
+        if not self.can_see_here():
+            return []
+
+        candidates = []
+
+        match obj_type:
+            case "exit":
+                candidates.extend(self.location.exits)
+            case "vehicle":
+                candidates.extend(self.location.vehicles.all())
+            case "item":
+                candidates.extend(self.location.inventory.all())
+            case "character":
+                candidates.extend(self.location.people.all())
+
+        candidates.remove(self)
+        return self.filter_visible(candidates)
+
     @lazy_property
     def size(self):
         return SizeHandler(self)
@@ -334,9 +360,11 @@ class GameObj:
             searchname = m.group("name")
 
             if candidates:
-                candidates = parse_sdescs_and_recogs(
-                    self, candidates, _PREFIX + searchname, search_mode=True
-                )
+                if not searchname.startswith("*"):
+                    # the * check means it matches everything.
+                    candidates = parse_sdescs_and_recogs(
+                        self, candidates, _PREFIX + searchname, search_mode=True
+                    )
 
                 for candidate in candidates:
                     # we search by candidate keys here; this allows full error

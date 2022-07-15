@@ -33,3 +33,14 @@ class FightCommand(ActionCommand):
 class StandCommand(ActionCommand):
     min_position = Position.STANDING
 
+
+class RestingCommand(ActionCommand):
+    min_position = Position.RESTING
+
+
+class DeadCommand(ActionCommand):
+    min_position = Position.DEAD
+
+
+class SleepCommand(ActionCommand):
+    min_position = Position.SLEEPING

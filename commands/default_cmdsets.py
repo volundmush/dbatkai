@@ -18,7 +18,7 @@ from athanor.commands import cmdsets as default_cmds
 from evennia.contrib.rpg.rpsystem import RPSystemCmdSet
 from commands.account_admin import CmdLegacyImport
 
-from commands import characters as c
+from commands import characters as c, inventory as i
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -41,6 +41,10 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(c.Transform)
         self.add(c.Equip)
         self.add(RPSystemCmdSet)
+        self.add(i.Get)
+        self.add(i.Put)
+        self.add(i.Give)
+        self.add(i.Drop)
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
