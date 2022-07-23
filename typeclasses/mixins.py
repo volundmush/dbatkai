@@ -192,10 +192,6 @@ class GameObj:
     def get_visible_sex(self, looker=None, **kwargs):
         return Sex.NEUTER
 
-    def act(self, text=None, mapping=None, msg_type="pose", exclude=None, **kwargs):
-        if self.location:
-            self.location.msg_contents(text=(text, {"type": msg_type}), from_obj=self, mapping=mapping, exclude=exclude, **kwargs)
-
     @lazy_property
     def level(self):
         return BoundedStatHandler(self, "level", default=1, min_amt=1, max_amt=100)
