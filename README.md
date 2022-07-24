@@ -4,7 +4,7 @@ An Evennia-based port of the original Dragon Ball Advent Truth
 
 An overview of this directory is found [here](https://github.com/evennia/evennia/wiki/Directory-Overview#the-game-directory)
 
-## Program structure
+## Directory structure
 `./` is your main game directory where you can set the game up and start with your new game right away. The directory structure is highly customizable and can be re-arranged to suit your sense of organisation except for the `server/` directory, as Evennia expects. If you change the directory structure, you must edit/add to your settings file to tell Evennia where to look for things.
 
 ## Instruction
@@ -26,7 +26,7 @@ to your new game using a MUD client on `localhost`, port `4000`.  You can
 also log into the web client by pointing a browser to
 `http://localhost:4001`.
 
-# Getting started
+## Getting started
 
 From here on you might want to look at one of the beginner tutorials:
 http://github.com/evennia/evennia/wiki/Tutorials.
