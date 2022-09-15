@@ -2,6 +2,7 @@ from .base import Modifier as _BaseMod
 from advent.typing import Size
 from . import transformations as t
 import typing
+from athanor import EQUIP_SLOTS
 
 
 class _Race(_BaseMod):
@@ -20,6 +21,9 @@ class _Race(_BaseMod):
     def generate_sdesc(self) -> str:
         return f"{self.owner.gender} {self.get_name().lower()}"
 
+    def get_available_limbs(self):
+        return {"left_arm": 100, "right_arm": 100, "left_leg": 100, "right_leg": 100}
+
 
 class Human(_Race):
     modifier_id = 0
@@ -37,10 +41,16 @@ class Saiyan(_Race):
         else:
             return [t.SuperSaiyan, t.SuperSaiyan2, t.SuperSaiyan3, t.SuperSaiyan4]
 
+    def get_available_limbs(self):
+        return super().get_available_limbs().update({"tail": 100})
+
 
 class Icer(_Race):
     modifier_id = 2
     abbr = "Ice"
+
+    def get_available_limbs(self):
+        return super().get_available_limbs().update({"tail": 100})
 
 
 class Konatsu(_Race):
@@ -73,11 +83,17 @@ class Halfbreed(_Race):
     def get_available_transformations(self, obj) -> list[typing.Type[t._Form]]:
         return [t.HBSuperSaiyan, t.HBSuperSaiyan2, t.HBSuperSaiyan3]
 
+    def get_available_limbs(self):
+        return super().get_available_limbs().update({"tail": 100})
+
 
 class BioAndroid(_Race):
     modifier_id = 8
     abbr = "Bio"
     seeming_ok = False
+
+    def get_available_limbs(self):
+        return super().get_available_limbs().update({"tail": 100})
 
 
 class Android(_Race):

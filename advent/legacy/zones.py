@@ -7,6 +7,11 @@ from advent.legacy.models import LegacyRoom
 from evennia import search_tag
 from advent.legacy.models import ZoneDB
 
+from rich.console import group
+from rich.table import Table
+from rich.text import Text
+from rich.style import NULL_STYLE
+
 
 class DefaultZone(ZoneDB, metaclass=TypeclassBase):
 

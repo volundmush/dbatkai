@@ -84,18 +84,37 @@ MAX_NR_CHARACTERS = 10
 DG_FUNCTIONS["shared"].extend([
     "advent.dgscripts.shared"
 ])
+
 DG_FUNCTIONS["character"].extend([
     "advent.dgscripts.character"
 ])
+
 DG_FUNCTIONS["item"].extend([
     "advent.dgscripts.item"
 ])
+
 DG_FUNCTIONS["room"].extend([
 
 ])
 
-SEARCH_MULTIMATCH_REGEX = r"^(?:(?P<number>(\d+|all|\*))\.)?(?P<name>\S+)$"
+SEARCH_MULTIMATCH_REGEX = r"^(?:(?P<number>(\d+|all|\*))\.)?(?P<name>.+?)(?: +(?P<args>.+)?)?$"
 
 SEARCH_MULTIMATCH_TEMPLATE = " {number}.{name} - {aliases} - {info}\n"
 
 SEARCH_AT_RESULT = "advent.utils.at_search_result"
+
+PROTOTYPE_MODULES.extend([
+    "world.proto_legacy_items",
+    "world.proto_legacy_mobs"
+])
+
+
+EQUIP_CLASS_PATHS.extend([
+    "advent.equip"
+])
+
+CHARACTER_COMMAND_PATHS = [
+    "commands.char_info",
+    "commands.char_item",
+    "commands.char_other"
+]

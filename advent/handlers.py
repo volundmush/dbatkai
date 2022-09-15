@@ -150,3 +150,32 @@ class PromptHandler:
         prompt_sections.append(f"|W[|cKI|y: |C{self.owner.ki.effective():,}|W]")
         prompt_sections.append(f"|W[|gST|y: |C{self.owner.stamina.effective():,}|W]")
         return "|n".join(prompt_sections)
+
+
+class LimbHandler:
+
+    def __init__(self, owner):
+        self.owner = owner
+        self.data = owner.attributes.get(key="limb_condition", default=dict())
+
+    def get(self, limb_name: str) -> int:
+        return self.data.get(limb_name, 0)
+
+    def has(self, limb_name: str) -> bool:
+        return bool(self.get(limb_name))
+
+    def reset(self):
+        self.data = self.owner.race.get().get_available_limbs()
+        self.save()
+
+    def save(self):
+        self.owner.attributes.add("limb_condition", self.data)
+
+    def modify(self, limb_name: str, amt: int, create_obj=False):
+        self.data[limb_name] = max(0, min(self.data[limb_name] + amt, 100))
+        if not self.data[limb_name] and create_obj:
+            self.create_object(limb_name)
+        self.save()
+
+    def create_object(self, limb_name: str):
+        pass

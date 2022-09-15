@@ -18,7 +18,7 @@ from athanor.commands import cmdsets as default_cmds
 from evennia.contrib.rpg.rpsystem import RPSystemCmdSet
 from commands.account_admin import CmdLegacyImport
 
-from commands import characters as c, inventory as i
+from advent import CHARACTER_COMMANDS
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -38,13 +38,9 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
-        self.add(c.Transform)
-        self.add(c.Equip)
         self.add(RPSystemCmdSet)
-        self.add(i.Get)
-        self.add(i.Put)
-        self.add(i.Give)
-        self.add(i.Drop)
+        for c in CHARACTER_COMMANDS:
+            self.add(c)
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

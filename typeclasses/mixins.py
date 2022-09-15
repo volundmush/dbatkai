@@ -116,10 +116,10 @@ def search_game_object(
         if not match_number.isnumeric():
             return matches
         # multiple matches, but a number was given to separate them
-        if 0 <= match_number < len(matches):
+        if 0 <= int(match_number)-1 < len(matches):
             # limit to one match (we still want a queryset back)
             # TODO: Can we do this some other way and avoid a second lookup?
-            matches = ObjectDB.objects.filter(id=matches[match_number].id)
+            matches = ObjectDB.objects.filter(id=matches[int(match_number)-1].id)
         else:
             # a number was given outside of range. This means a no-match.
             matches = ObjectDB.objects.none()
@@ -302,15 +302,15 @@ class GameObj:
                 searchdata, categories=("object", "account"), include_account=True
             )
 
-        if global_search or (
-            is_string
-            and searchdata.startswith("#")
-            and len(searchdata) > 1
-            and searchdata[1:].isdigit()
-        ):
-            # only allow exact matching if searching the entire database
-            # or unique #dbrefs
+        # the sdesc-related substitution
+        is_builder = self.locks.check_lockstring(self, "perm(Builder)")
+        use_dbref = is_builder if use_dbref is None else use_dbref
+
+        if use_dbref and is_string and searchdata.startswith("#") and len(searchdata) > 1 and searchdata[1:].isdigit():
             exact = True
+
+        if global_search:
+            pass
         elif candidates is None:
             # no custom candidates given - get them automatically
             if location:
@@ -331,9 +331,7 @@ class GameObj:
                     # included in location.contents
                     candidates.append(self)
 
-        # the sdesc-related substitution
-        is_builder = self.locks.check_lockstring(self, "perm(Builder)")
-        use_dbref = is_builder if use_dbref is None else use_dbref
+
 
         def search_obj(string):
             "helper wrapper for searching"
@@ -347,13 +345,32 @@ class GameObj:
             )
 
         results = []
+        global _SEARCH
+        if not _SEARCH:
+            from django.conf import settings
+            _SEARCH = class_from_module(settings.SEARCH_AT_RESULT)
+
         if attribute_name:
             # let Evennia's default search handle attribute_name searches
             results = search_obj(searchdata)
+        elif global_search or (use_dbref and searchdata.startswith("#") and searchdata[1:].isdigit()):
+            print("We got here")
+            results = search_obj(searchdata)
         else:
-            m = _MULTIMATCH_REGEX.match(searchdata)
+            if not (m := _MULTIMATCH_REGEX.match(searchdata)):
+                if quiet or allow_multiple:
+                    return results
+
+                return _SEARCH(
+                    results,
+                    self,
+                    query=searchdata,
+                    nofound_string=nofound_string,
+                    multimatch_string=multimatch_string,
+                )
             sel = m.group("number")
             searchname = m.group("name")
+            print(f"MATCHDICT: {m.groupdict()}")
 
             if candidates:
                 if not searchname.startswith("*"):
@@ -392,10 +409,6 @@ class GameObj:
         if quiet or allow_multiple:
             return results
 
-        global _SEARCH
-        if not _SEARCH:
-            from django.conf import settings
-            _SEARCH = class_from_module(settings.SEARCH_AT_RESULT)
         return _SEARCH(
             results,
             self,

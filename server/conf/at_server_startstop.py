@@ -17,6 +17,15 @@ at_server_cold_stop()
 """
 
 
+def at_server_init():
+    from django.conf import settings
+    from evennia.utils.utils import callables_from_module
+    from advent import CHARACTER_COMMANDS
+
+    for p in settings.CHARACTER_COMMAND_PATHS:
+        CHARACTER_COMMANDS.extend(callables_from_module(p).values())
+
+
 def at_server_start():
     """
     This is called every time the server starts up, regardless of

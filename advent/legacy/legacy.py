@@ -32,14 +32,23 @@ class Importer:
         self.zone_ids = dict()
         self.pc_map = dict()
         self.majin_map = dict()
-        proto_file = Path("world") / "prototypes.py"
-        self.proto_file = open(proto_file, mode="a")
-        self.proto_file.write("from athanor.typing import ExitDir\n")
-        self.proto_file.write("from advent.typing import Size, Sex\n\n")
+        item_file = Path("world") / "proto_legacy_items.py"
+        mob_file = Path("world") / "proto_legacy_mobs.py"
+        self.item_file = open(item_file, mode="w")
+        self.mob_file = open(mob_file, mode="w")
+        self.mob_file.write("from advent.typing import Size, Sex\n\n")
+        self.item_file.write("from advent.typing import Size\n\n")
 
     def msg(self, txt):
         self.caller.msg(txt)
         print(txt)
+
+    wears = {0: "take", 1: "finger", 2: "neck", 3: "body", 4: "head", 5: "legs", 6: "feet", 7: "hands", 8: "arms",
+             9: "shield", 10: "about", 11: "waist", 12: "wrist", 13: "wield", 14: "hold", 15: "back", 16: "ear",
+             17: "shoulders", 18: "eyes"}
+
+    def convert_wears(self, wear_flags: list[int]) -> list[str]:
+        return [self.wears[f] for f in wear_flags]
 
     def _load_item(self, j: dict) -> Item:
 
@@ -57,9 +66,11 @@ class Importer:
 
         contents = j.pop("contents", list())
 
+        tags = [(w, "wear") for w in self.convert_wears(j.pop("wear_flags", list()))]
+
         attributes = [[k, v] for k, v in j.items()]
 
-        obj, errors = Item.create(key, attributes=attributes)
+        obj, errors = Item.create(key, attributes=attributes, tags=tags)
         if errors:
             self.msg(errors)
 
@@ -70,6 +81,7 @@ class Importer:
 
         return obj
 
+    limb_map = {0: "right_arm", 1: "left_arm", 2: "right_leg", 3: "left_leg"}
 
     def load_characters(self):
         c_dir = self.path / "characters"
@@ -80,15 +92,13 @@ class Importer:
         for d in [d for d in c_dir.iterdir() if d.is_file()]:
             if not (j := read_json_file(d)):
                 continue
+
             count += 1
             p_specials = j.pop("player_specials")
             acc_id = p_specials.pop("account_id")
             acc = self.account_map[acc_id]
-            data = {}
 
-            data["location"] = None
-
-            data["key"] = j.pop("key")
+            data = {"location": None, "key": j.pop("key")}
 
             self.msg(f"Creating {acc.key}'s character: {data['key']}")
 
@@ -104,6 +114,9 @@ class Importer:
 
             if "skills" in j:
                 j["skills"] = {k: v for k, v in j["skills"]}
+
+            if "limb_condition" in j:
+                j["limb_condition"] = {self.limb_map[limb]: v for limb, v in j.pop("limb_condition")}
 
             if "prelogout_location" in j:
                 if (found := LegacyRoom.objects.filter(id=j["prelogout_location"]).first()):
@@ -251,7 +264,7 @@ class Importer:
             "typeclass": "typeclasses.characters.NonPlayerCharacter"
         }
 
-        self.proto_file.write(f"{proto['prototype_key']} = {repr(proto)}\n\n")
+        self.mob_file.write(f"{proto['prototype_key']} = {repr(proto)}\n\n")
 
         #save_prototype(proto)
         count = 0
@@ -285,7 +298,7 @@ class Importer:
                 #if "sex" in j:
                 #    j["sex"] = Sex(j["sex"])
 
-                self.proto_file.write(f"{j['prototype_key']} = {repr(j)}\n\n")
+                self.mob_file.write(f"{j['prototype_key']} = {repr(j)}\n\n")
                 #save_prototype(j)
 
         return count
@@ -301,7 +314,7 @@ class Importer:
             "typeclass": "typeclasses.items.Item"
         }
 
-        self.proto_file.write(f"{proto['prototype_key']} = {repr(proto)}\n\n")
+        self.item_file.write(f"{proto['prototype_key']} = {repr(proto)}\n\n")
 
         #save_prototype(proto)
         count = 0
@@ -333,10 +346,14 @@ class Importer:
                 #if "size" in j:
                 #    j["size"] = Size(j["size"])
 
+                tags = [(w, "wear", None) for w in self.convert_wears(j.pop("wear_flags", list()))]
+                if tags:
+                    j["tags"] = tags
+
                 if "ex_descriptions" in j:
                     j["ex_descriptions"] = [[keyword, CircleToEvennia(desc)] for keyword, desc in j.pop("ex_descriptions")]
 
-                self.proto_file.write(f"{j['prototype_key']} = {repr(j)}\n\n")
+                self.item_file.write(f"{j['prototype_key']} = {repr(j)}\n\n")
 
                 #save_prototype(j)
 
@@ -556,4 +573,5 @@ class Importer:
         #count = self.load_houses()
         self.msg(f"Imported {count} Houses!")
 
-        self.proto_file.close()
+        self.item_file.close()
+        self.mob_file.close()

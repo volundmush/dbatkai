@@ -13,7 +13,7 @@ from evennia.utils.utils import lazy_property
 from athanor.modifiers import FlagsHandler, FlagHandler
 from .mixins import GameObj
 from advent.handlers import PercentHandler, PowerStatHandler, PowerLevelHandler, StatHandler, \
-    CharacterSizeHandler, PromptHandler, BoundedStatHandler
+    CharacterSizeHandler, PromptHandler, BoundedStatHandler, LimbHandler
 from advent.utils import INFLECT
 from advent.typing import WearSlot
 
@@ -54,6 +54,10 @@ class Character(GameObj, ContribRPCharacter, AthanorCharacter):
     @lazy_property
     def prompt(self):
         return PromptHandler(self)
+
+    @lazy_property
+    def limbs(self):
+        return LimbHandler(self)
 
     # power stats.
     @lazy_property
@@ -136,6 +140,14 @@ class Character(GameObj, ContribRPCharacter, AthanorCharacter):
                 return "female"
             case _:
                 return "neutral"
+
+    def all_equip_slots(self):
+        """
+        Replace this method with one for this typeclasses's equip slots.
+        """
+        if (race := self.race.get()):
+            return race.all_equip_slots()
+        return dict()
 
     # size
     @lazy_property
