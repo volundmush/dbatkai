@@ -4,7 +4,7 @@ Evennia settings file.
 The available options are found in the default settings file found
 here:
 
-/home/volund/PycharmProjects/evennia/evennia/settings_default.py
+C:\Users\basti\PycharmProjects\evennia\evennia\settings_default.py
 
 Remember:
 
@@ -32,7 +32,30 @@ from athanor.settings import *
 ######################################################################
 
 # This is the name of your game. Make it catchy!
-SERVERNAME = "Dragon Ball Advent Truth"
+SERVERNAME = "Dragon Ball Advent Truth Kai"
+
+# Typeclass for account objects (linked to a character) (fallback)
+BASE_ACCOUNT_TYPECLASS = "typeclasses.accounts.Account"
+# Typeclass and base for all objects (fallback)
+BASE_OBJECT_TYPECLASS = "typeclasses.objects.Object"
+BASE_ITEM_TYPECLASS = BASE_OBJECT_TYPECLASS
+# Typeclass for character objects linked to an account (fallback)
+BASE_CHARACTER_TYPECLASS = "typeclasses.characters.PlayerCharacter"
+# Typeclass for rooms (fallback)
+BASE_ROOM_TYPECLASS = "typeclasses.rooms.Room"
+# Typeclass for Exit objects (fallback).
+BASE_EXIT_TYPECLASS = "typeclasses.exits.Exit"
+# Typeclass for Channel (fallback).
+BASE_CHANNEL_TYPECLASS = "typeclasses.channels.Channel"
+# Typeclass for Scripts (fallback). You usually don't need to change this
+# but create custom variations of scripts on a per-case basis instead.
+BASE_SCRIPT_TYPECLASS = "typeclasses.scripts.Script"
+
+
+BASE_NPC_TYPECLASS = "typeclasses.characters.NonPlayerCharacter"
+BASE_SECTOR_TYPECLASS = "athanor.typeclasses.sectors.AthanorSector"
+BASE_GRID_TYPECLASS = "athanor.typeclasses.grids.AthanorGrid"
+BASE_STRUCTURE_TYPECLASS = "athanor.typeclasses.structures.AthanorStructure"
 
 
 ######################################################################
@@ -43,78 +66,14 @@ try:
 except ImportError:
     print("secret_settings.py file not found or failed to import.")
 
+DG_INSTANCE_CLASSES = dict()
 
-INSTALLED_APPS.extend([
-    "advent.legacy",
-])
+DG_VARS = ["advent.dgscripts.dgvars"]
 
+DG_FUNCTIONS = ["advent.dgscripts.dgfuncs"]
 
-MODIFIER_PATHS.extend([
-    "advent.modifiers.admin_flags",
-    "advent.modifiers.affects",
-    "advent.modifiers.bonuses",
-    "advent.modifiers.item_flags",
-    "advent.modifiers.item_types",
-    "advent.modifiers.mob_flags",
-    "advent.modifiers.player_flags",
-    "advent.modifiers.positions",
-    "advent.modifiers.preference_flags",
-    "advent.modifiers.races",
-    "advent.modifiers.room_flags",
-    "advent.modifiers.room_sectors",
-    "advent.modifiers.sensei",
-    "advent.modifiers.wear_flags",
-    "advent.modifiers.zone_flags",
-    "advent.modifiers.genomes",
-    "advent.modifiers.mutations",
-    "advent.modifiers.android",
-    "advent.modifiers.transformations"
-])
+ASPECT_SLOT_CLASS_PATHS.append("advent.aspects.slots")
+ASPECT_CLASS_PATHS.extend(["advent.aspects.race", "advent.aspects.subrace", "advent.aspects.sensei"])
 
-BASE_CHARACTER_TYPECLASS = "typeclasses.characters.PlayerCharacter"
-
-BASE_ZONE_TYPECLASS = "advent.legacy.zones.DefaultZone"
-
-SYSTEMS.extend([
-    "advent.systems.ZoneSystem",
-])
-
-MAX_NR_CHARACTERS = 10
-
-DG_FUNCTIONS["shared"].extend([
-    "advent.dgscripts.shared"
-])
-
-DG_FUNCTIONS["character"].extend([
-    "advent.dgscripts.character"
-])
-
-DG_FUNCTIONS["item"].extend([
-    "advent.dgscripts.item"
-])
-
-DG_FUNCTIONS["room"].extend([
-
-])
-
-SEARCH_MULTIMATCH_REGEX = r"^(?:(?P<number>(\d+|all|\*))\.)?(?P<name>.+?)(?: +(?P<args>.+)?)?$"
-
-SEARCH_MULTIMATCH_TEMPLATE = " {number}.{name} - {aliases} - {info}\n"
-
-SEARCH_AT_RESULT = "advent.utils.at_search_result"
-
-PROTOTYPE_MODULES.extend([
-    "world.proto_legacy_items",
-    "world.proto_legacy_mobs"
-])
-
-
-EQUIP_CLASS_PATHS.extend([
-    "advent.equip"
-])
-
-CHARACTER_COMMAND_PATHS = [
-    "commands.char_info",
-    "commands.char_item",
-    "commands.char_other"
-]
+QUIRK_SLOT_CLASS_PATHS.append("advent.quirks.slots")
+QUIRK_CLASS_PATHS.extend(["advent.quirks.bonuses", "advent.quirks.flaws"])

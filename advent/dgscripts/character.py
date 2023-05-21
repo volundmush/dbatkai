@@ -1,4 +1,5 @@
-from athanor.dgscripts.dgscripts import stat_get_set
+from advent.dgscripts.dgscripts import stat_get_set
+
 
 def _powerstat_get_set(obj, script, field, handler, arg):
     if arg:
@@ -8,17 +9,6 @@ def _powerstat_get_set(obj, script, field, handler, arg):
             script.script_log(f"invalid arg for {field}: {arg}")
     return str(getattr(obj, handler).current())
 
-
-def race(obj, script, arg):
-    return obj.race.get().get_name()
-
-
-def sensei(obj, script, arg):
-    return obj.sensei.get().get_name()
-
-
-def CLASS(obj, script, arg):
-    return sensei(obj, script, arg)
 
 
 def bank(obj, script, arg):

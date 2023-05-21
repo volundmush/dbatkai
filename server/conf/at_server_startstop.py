@@ -7,6 +7,7 @@ allows for customizing the server operation as desired.
 
 This module must contain at least these global functions:
 
+at_server_init()
 at_server_start()
 at_server_stop()
 at_server_reload_start()
@@ -18,12 +19,10 @@ at_server_cold_stop()
 
 
 def at_server_init():
-    from django.conf import settings
-    from evennia.utils.utils import callables_from_module
-    from advent import CHARACTER_COMMANDS
-
-    for p in settings.CHARACTER_COMMAND_PATHS:
-        CHARACTER_COMMANDS.extend(callables_from_module(p).values())
+    """
+    This is called first as the server is starting up, regardless of how.
+    """
+    pass
 
 
 def at_server_start():

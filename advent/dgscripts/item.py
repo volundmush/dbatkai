@@ -1,4 +1,4 @@
-from athanor.dgscripts.dgscripts import stat_get_set
+from advent.dgscripts.dgscripts import stat_get_set
 
 
 def cost(obj, script, arg):
@@ -15,8 +15,6 @@ def carried_by(obj, script, arg):
     if obj.location and obj.location.obj_type == "character":
         return obj.location.dbref
     return ""
-
-from .shared import inventory as _inv
 
 contents = _inv
 

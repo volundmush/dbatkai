@@ -10,11 +10,34 @@ the other types, you can do so by adding this as a multiple
 inheritance.
 
 """
-from athanor.typeclasses.objects import AthanorObject
-from .mixins import GameObj
+from evennia.utils.utils import lazy_property
+from athanor.typeclasses.items import AthanorItem
+from advent.dgscripts.dgscripts import DGHandler
 
 
-class Object(GameObj, AthanorObject):
+class ObjectParent:
+    """
+    This is a mixin that can be used to override *all* entities inheriting at
+    some distance from DefaultObject (Objects, Exits, Characters and Rooms).
+
+    Just add any method that exists on `DefaultObject` to this class. If one
+    of the derived classes has itself defined that same hook already, that will
+    take precedence.
+
+    """
+
+    @lazy_property
+    def dgscripts(self):
+        return DGHandler(self)
+
+    def at_object_creation(self):
+        super().at_object_creation()
+        for script_key in self.attributes.get(key="dg_scripts", default=list()):
+            self.dgscripts.attach(script_key)
+        self.dgscripts.trigger("load")
+
+
+class Object(ObjectParent, AthanorItem):
     """
     This is the root typeclass object, implementing an in-game Evennia
     game object, such as having a location, being able to be
@@ -120,13 +143,13 @@ class Object(GameObj, AthanorObject):
                             of a lock access check on this object. Return value
                             does not affect check result.
 
-     at_before_move(destination)             - called just before moving object
+     at_pre_move(destination)             - called just before moving object
                         to the destination. If returns False, move is cancelled.
      announce_move_from(destination)         - called in old location, just
                         before move, if obj.move_to() has quiet=False
      announce_move_to(source_location)       - called in new location, just
                         after move, if obj.move_to() has quiet=False
-     at_after_move(source_location)          - always called after a move has
+     at_post_move(source_location)          - always called after a move has
                         been successfully performed.
      at_object_leave(obj, target_location)   - called when an object leaves
                         this object in any fashion
@@ -137,7 +160,7 @@ class Object(GameObj, AthanorObject):
                               handles all moving across the exit, including
                               calling the other exit hooks. Use super() to retain
                               the default functionality.
-     at_after_traverse(traversing_object, source_location) - (exit-objects only)
+     at_post_traverse(traversing_object, source_location) - (exit-objects only)
                               called just after a traversal has happened.
      at_failed_traverse(traversing_object)      - (exit-objects only) called if
                        traversal fails and property err_traverse is not defined.
@@ -158,6 +181,13 @@ class Object(GameObj, AthanorObject):
      at_say(speaker, message)  - by default, called if an object inside this
                                  object speaks
 
-     """
+    """
 
+    pass
+
+
+Item = Object
+
+
+class Portal(Item):
     pass

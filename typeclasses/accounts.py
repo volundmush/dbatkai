@@ -21,9 +21,8 @@ possibility to connect with a guest account. The setting file accepts
 several more options for customizing the Guest account system.
 
 """
-from django.conf import settings
+
 from athanor.typeclasses.accounts import AthanorAccount
-from evennia import DefaultGuest
 
 
 class Account(AthanorAccount):
@@ -92,10 +91,11 @@ class Account(AthanorAccount):
      at_server_shutdown()
 
     """
+
     pass
 
 
-class Guest(DefaultGuest):
+class Guest(AthanorAccount):
     """
     This class is used for guest logins. Unlike Accounts, Guests and their
     characters are deleted after disconnection.

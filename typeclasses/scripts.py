@@ -12,10 +12,12 @@ just overloads its hooks to have it perform its function.
 
 """
 
-from evennia import DefaultScript
+from athanor.typeclasses.scripts import AthanorScript
+from evennia.utils.utils import make_iter
+from evennia.utils.search import search_script_tag
 
 
-class Script(DefaultScript):
+class Script(AthanorScript):
     """
     A script type is customized by redefining some or all of its hook
     methods and variables.
@@ -90,3 +92,45 @@ class Script(DefaultScript):
     """
 
     pass
+
+
+class Zone(Script):
+    """
+    A Zone is a Script which manages legacy-style data for DBAT Kai.
+    It hangs on to the legacy zone data and indexes resources.
+    """
+
+    def at_script_creation(self):
+        self.db.name = self.key
+        self.db.min = 0
+        self.db.max = 0
+        self.db.builders = set()
+        self.db.rooms = set()
+        self.db.npc_prototypes = set()
+        self.db.object_prototypes = set()
+        self.db.shops = set()
+        self.db.guilds = set()
+        self.db.dgscripts = set()
+
+
+class DgScriptPrototype(Script):
+    """
+    Used to store and organize DgScript prototypes.
+
+    A DgScriptPrototype's key must always be dg_script_# where # is its legacy vnum.
+    """
+
+    def at_script_creation(self):
+        self.db.name = self.key
+        self.db.script_type = ""
+        self.db.script_body = ""
+        self.db.arglist = ""
+        self.db.zone = None
+
+    def instances(self) -> set[AthanorScript]:
+        return search_script_tag(self.key, category="dgscript")
+
+    def trigger_types(self) -> set[str]:
+        if (tags := self.tags.get(category="trigger_type")):
+            return set(make_iter(tags))
+        return set()

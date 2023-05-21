@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-TEXT_FILES = {}
+DG_FUNCTIONS = defaultdict(dict)
 
-ZONE_TIMER = defaultdict(int)
+DG_INSTANCE_CLASSES = dict()
 
-CHARACTER_COMMANDS = []
+DG_VARS = dict()
