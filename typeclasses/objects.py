@@ -36,6 +36,14 @@ class ObjectParent:
             self.dgscripts.attach(script_key)
         self.dgscripts.trigger("load")
 
+    def can_see_here(self) -> bool:
+        return True
+
+    def get_visible_nearby(self, obj_type: str = None) -> list["AthanorItem"]:
+        if not self.can_see_here():
+            return []
+        return super().get_visible_nearby(obj_type=obj_type)
+
 
 class Object(ObjectParent, AthanorItem):
     """

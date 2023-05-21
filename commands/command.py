@@ -30,7 +30,15 @@ class Command(BaseCommand):
     #     - at_post_cmd(): Extra actions, often things done after
     #         every command, like prompts.
     #
-    pass
+
+    def parse(self):
+        super().parse()
+        self.full_args = self.args
+        self.args = self.args.strip()
+
+
+
+
 
 
 # -------------------------------------------------------------

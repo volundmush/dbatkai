@@ -73,7 +73,8 @@ DG_VARS = ["advent.dgscripts.dgvars"]
 DG_FUNCTIONS = ["advent.dgscripts.dgfuncs"]
 
 ASPECT_SLOT_CLASS_PATHS.append("advent.aspects.slots")
-ASPECT_CLASS_PATHS.extend(["advent.aspects.race", "advent.aspects.subrace", "advent.aspects.sensei"])
+ASPECT_CLASS_PATHS.extend(["advent.aspects.race", "advent.aspects.subrace", "advent.aspects.sensei",
+                           "advent.aspects.position", "advent.aspects.sector_type"])
 
 QUIRK_SLOT_CLASS_PATHS.append("advent.quirks.slots")
 QUIRK_CLASS_PATHS.extend(["advent.quirks.bonuses", "advent.quirks.flaws"])

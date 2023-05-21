@@ -21,4 +21,7 @@ class Room(ObjectParent, AthanorRoom):
     properties and methods available on all Objects.
     """
 
-    pass
+    def all_aspect_slots(self) -> dict[str, dict]:
+        slots = super().all_aspect_slots()
+        slots["sector_type"] = {}
+        return slots

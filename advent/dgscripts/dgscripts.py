@@ -152,7 +152,7 @@ class DGScriptInstance(Script):
 
     def set_state(self, state: DGState):
         self.db.state = state
-        print(f"{self} STATE: {self.db.state.name}")
+        #print(f"{self} STATE: {self.db.state.name}")
 
     def at_repeat(self):
         match self.db.state:
@@ -168,7 +168,7 @@ class DGScriptInstance(Script):
             self.execute()
 
     def execute(self) -> int:
-        print(f"EXECUTE: {self}")
+        #print(f"EXECUTE: {self}")
         try:
             match self.db.state:
                 case DGState.RUNNING | DGState.ERROR | DGState.DONE | DGState.PURGED:
@@ -193,10 +193,10 @@ class DGScriptInstance(Script):
         self.db.curr_line = start
 
         while self.db.curr_line < end:
-            print(f"CURR_LINE: {self.db.curr_line} against {end}")
+            #print(f"CURR_LINE: {self.db.curr_line} against {end}")
 
             if self.db.loops == 500:
-                print(f"{self} RAN TOO LONG!")
+                #print(f"{self} RAN TOO LONG!")
                 # this has run long enough, let's pause it.
                 self.set_state(DGState.WAITING)
                 self.db.wait_time = 1.0
@@ -211,16 +211,16 @@ class DGScriptInstance(Script):
 
             line = self.get_line(self.db.curr_line)
             if not line or line.startswith("*"):
-                print(f"GOT COMMENT... skipping...")
+                pass  #print(f"GOT COMMENT... skipping...")
 
             # cover if
             elif line.startswith("if "):
                 self.db.depth.append((Nest.IF, self.db.curr_line))
-                print(f"CHECKING IF: {line}")
+                #print(f"CHECKING IF: {line}")
                 if not self.process_if(line[3:]):
-                    print(f"IF {line} failed, checking for else/end...")
+                    #print(f"IF {line} failed, checking for else/end...")
                     self.db.curr_line = self.find_else_end()
-                    print(f"IF Failed, proceeding at {self.db.curr_line}")
+                    #print(f"IF Failed, proceeding at {self.db.curr_line}")
                     continue
             elif line.startswith("elseif "):
                 if not self.db.depth or self.db.depth[-1][0] != Nest.IF:
@@ -236,13 +236,13 @@ class DGScriptInstance(Script):
                 if not self.db.depth or self.db.depth[-1][0] != Nest.IF:
                     raise DGScriptError("'end' outside of an if block")
                 self.db.depth.pop()
-                print(f"END OF IF {self.db.curr_line}")
+                #print(f"END OF IF {self.db.curr_line}")
 
             # cover while
             elif line.startswith("while "):
                 self.db.depth.append((Nest.WHILE, self.db.curr_line))
                 if not self.process_if(line[6:]):
-                    print(f"WHILE {line} IS TRUE")
+                    #print(f"WHILE {line} IS TRUE")
                     self.db.curr_line = self.find_done()
                     continue
 
@@ -270,21 +270,21 @@ class DGScriptInstance(Script):
                 match self.db.depth[-1][0]:
                     case Nest.WHILE:
                         # Rewind back to the while clause.
-                        print(f"REACHED WHILE END {self.db.curr_line}")
+                        #print(f"REACHED WHILE END {self.db.curr_line}")
                         self.db.curr_line = self.db.depth[-1][1]
                         self.db.depth.pop()
                         continue
                     case Nest.SWITCH:
-                        print(f"REACHED SWITCH END {self.db.curr_line}")
+                        #print(f"REACHED SWITCH END {self.db.curr_line}")
                         self.db.depth.pop()
                     case _:
                         raise DGScriptError("'done' outside of a switch-case or while block")
 
 
             else:
-                print(f"Checking Line... {line}")
+                #print(f"Checking Line... {line}")
                 sub_cmd = self.var_subst(line)
-                print(f"post var_subst: {sub_cmd}")
+                #print(f"post var_subst: {sub_cmd}")
                 cmd_split = sub_cmd.split(" ", 1)
                 cmd = cmd_split[0]
 
@@ -313,29 +313,29 @@ class DGScriptInstance(Script):
                         if (func := getattr(self, f"cmd_{cmd}", None)):
                             func(sub_cmd)
                         else:
-                            print(f"Unrecognized command {cmd}, passing to execute_cmd...")
+                            #print(f"Unrecognized command {cmd}, passing to execute_cmd...")
                             self.handler.owner.execute_cmd(sub_cmd)
 
-            print(f"Incrementing line...")
+            #print(f"Incrementing line...")
             self.db.curr_line += 1
 
         self.set_state(DGState.DONE)
 
     def truthy(self, value: str) -> bool:
         if not value:
-            print(f"TRUTHY OF {value}: False")
+            #print(f"TRUTHY OF {value}: False")
             return False
         res = value != "0"
-        print(f"TRUTHY of {value}: {res}")
+        #print(f"TRUTHY of {value}: {res}")
         return res
 
     def process_if(self, cond: str) -> bool:
         result = self.truthy(self.maybe_negate(self.eval_expr(cond).strip()))
-        print(f"IF {cond} : {result}")
+        #print(f"IF {cond} : {result}")
         return result
 
     def eval_expr(self, line: str) -> str:
-        print(f"EVAL_EXPR: {line}")
+        #print(f"EVAL_EXPR: {line}")
         trimmed = line.strip()
         if trimmed.startswith("("):
             m = matching_paren(trimmed, 0)
@@ -364,18 +364,18 @@ class DGScriptInstance(Script):
     }
 
     def eval_lhs_op_rhs(self, expr: str) -> typing.Optional[str]:
-        print(f"EVAL_LHS_OP_RHS: {expr}")
+        #print(f"EVAL_LHS_OP_RHS: {expr}")
         for op in self.ops_map.keys():
             try:
                 lhs, rhs = expr.split(op, 1)
                 lhs = lhs.strip()
                 rhs = rhs.strip()
-                print(f"LHS: {lhs}, RHS: {rhs}")
+                #print(f"LHS: {lhs}, RHS: {rhs}")
                 lhr = self.eval_expr(lhs)
                 rhr = self.eval_expr(rhs)
-                print(f"LHR: {lhr}, RHR: {rhr}")
+                #print(f"LHR: {lhr}, RHR: {rhr}")
                 result = self.eval_op(op, lhr, rhr)
-                print(f"EVAL OP RESULT: {result}")
+                #print(f"EVAL OP RESULT: {result}")
                 return result
             except ValueError:
                 continue
@@ -387,7 +387,7 @@ class DGScriptInstance(Script):
 
     def eval_op(self, op: str, lhs: str, rhs: str) -> str:
         op_found = self.ops_map[op]
-        print(f"EVAL OP: {op} - {op_found}")
+        #print(f"EVAL OP: {op} - {op_found}")
         result = "0"
 
         lhs = self.maybe_negate(lhs)
@@ -421,40 +421,40 @@ class DGScriptInstance(Script):
 
     def get_line(self, i: int) -> str:
         line = self.db.lines[i].strip()
-        print(f"GET_LINE: {line}")
+        #print(f"GET_LINE: {line}")
         return line
 
     def find_else_end(self, match_elseif: bool = True, match_else: bool = True) -> int:
         if not self.db.depth or self.db.depth[-1][0] != Nest.IF:
-            print(f"FIND ELSE END WHOOPS 1")
+            #print(f"FIND ELSE END WHOOPS 1")
             raise DGScriptError("find_end called outside of if! alert a codewiz!")
 
         i = self.db.depth[-1][1] + 1
         total = len(self.db.lines)
         while i < total:
             line = self.get_line(i)
-            print(f"Scanning for Else {match_else}, Elseif {match_elseif}, line {i} : {line}")
+            #print(f"Scanning for Else {match_else}, Elseif {match_elseif}, line {i} : {line}")
             if not line or line.startswith("*"):
                 pass
 
             elif match_elseif and line.startswith("elseif ") and self.process_if(line[7:]):
-                print(f"found truthy elseif {i}")
+                #print(f"found truthy elseif {i}")
                 return i + 1
 
             elif match_else and (line.startswith("else ") or line == "else"):
-                print(f"found else {i}")
+                #print(f"found else {i}")
                 return i + 1
 
             elif line.startswith("end ") or line == "end":
-                print(f"found end {i}")
+                #print(f"found end {i}")
                 return i
 
             elif line.startswith("if "):
                 depth = len(self.db.depth)
-                print(f"Nested IF detected at {i}. Depth: {depth}")
+                #print(f"Nested IF detected at {i}. Depth: {depth}")
                 self.db.depth.append((Nest.IF, i))
                 i = self.find_end() + 1
-                print(f"exited depth {depth} IF...")
+                #print(f"exited depth {depth} IF...")
                 self.db.depth.pop()
                 continue
 
@@ -479,7 +479,7 @@ class DGScriptInstance(Script):
             elif line == "case" or line.startswith("case "):
                 raise DGScriptError("'case' outside of a switch-case block")
 
-            print(f"incrementing {i}")
+            #print(f"incrementing {i}")
             i += 1
 
         raise DGScriptError("'if' without corresponding end")
@@ -643,7 +643,6 @@ class DGScriptInstance(Script):
             elif callable(last_mem):
                 result = last_mem(self, **mem)
                 last_mem = _db_check(result)
-                last_mem = result
             elif isinstance(last_mem, str):
                 # strings CANNOT have members.
                 return ""
@@ -654,10 +653,9 @@ class DGScriptInstance(Script):
                 # this is probably a special var. Let's check those first.
                 if (found := DG_VARS.get(mem["member"].lower(), None)):
                     if callable(found):
-                        last_mem = found
+                        last_mem = _db_check(found(self, **mem))
                     elif isinstance(found, str):
                         last_mem = _db_check(found)
-                        last_mem = found
                 else:
                     v = self.db.vars.get(mem["member"].lower(), "")
                     last_mem = _db_check(v)
@@ -667,37 +665,15 @@ class DGScriptInstance(Script):
 
         if not isinstance(last_mem, str):
             return ""
+
+        #print(f"eval_var results: {last_mem}")
         return last_mem
-
-
-        if self._re_dbref.match(varname):
-            # this is a dbref. we should look it up.
-            if (found := ObjectDB.objects.filter(id=int(varname[1:])).first()):
-                return found.dgscripts.evaluate(self, varname, field, call, arg)
-            return ""
-
-        if (func := getattr(self, f"eval_var_{varname}", None)):
-            return func(varname, field, call, arg)
-
-        var = self.db.vars.get(varname, "")
-
-        if isinstance(var, str):
-            if self._re_dbref.match(var):
-                # variable contains a dbref. look it up.
-                if (found := ObjectDB.objects.filter(id=int(var[1:])).first()):
-                    return found.dgscripts.evaluate(self, varname, field, call, arg)
-                return ""
-            return var
-        else:
-            # if it's not a string but it exists, it -has- to be an actor.
-            return var.dgscripts.evaluate(self, varname, field, call, arg)
-
 
     def get_var(self, varname: str, context: int = -1) -> typing.Optional[str]:
         pass
 
     def var_subst(self, line: str) -> str:
-        print(f"VAR_SUBST: {line}")
+        #print(f"VAR_SUBST: {line}")
         out = ""
         i = 0
         escaped = False
@@ -905,16 +881,18 @@ class DGHandler:
 
         match member:
             case "vnum":
-                return str(self.owner.attributes.get(key=member, default=-1))
+                return True, str(self.owner.attributes.get(key=member, default=-1))
+            case "name":
+                return True, self.owner.get_display_name(looker=script.obj)
             case "is_pc":
-                return str(int(getattr(self.owner, "is_player", False)))
+                return True, str(int(getattr(self.owner, "is_player", False)))
             case "alignment":
                 if call and arg:
                     pass
                 return True, str(self.owner.stats.get_effective(member))
             case "affected_flags" | "extra_flags" | "wear_flags" | "room_flags" | "player_flags":
                 if call and arg:
-                    return str(int(bool(self.owner.tags.get(category=member, key=arg))))
+                    return True, str(int(bool(self.owner.tags.get(category=member, key=arg))))
 
         return False, None
 
@@ -954,7 +932,7 @@ class DgHandlerCharacter(DGHandler):
 
         match member:
             case "race" | "sensei":
-                return True, self.owner.aspects.get(member).get_name()
+                return True, self.owner.aspects.get_aspect(member).get_name()
             case "strength" | "intelligence" | "constitution" | "agility" | "wisdom" | "speed":
                 if call and arg:
                     pass  # Todo: coerce arg to int and call modify on stat...

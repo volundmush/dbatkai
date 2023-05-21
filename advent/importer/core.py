@@ -201,7 +201,16 @@ class Importer:
             if row["sense_location"] != "Unknown.":
                 room.tags.add(category="sense_location", key=row["sense_location"], data=row["sense_location"])
 
-            room.db.sector_name = row["sector_name"]
+            sector_name = row["sector_name"]
+            match row["sector_name"]:
+                case "Water (Fly)":
+                    sector_name = "Water"
+                case "$Shop":
+                    sector_name = "Shop"
+                case "#Important":
+                    sector_name = "Important"
+
+            room.aspects.set_aspect("sector_type", sector_name)
 
             c.execute(
                 "SELECT rb.name from room_flags AS rf LEFT JOIN room_bits AS rb ON rf.flag_id=rb.id WHERE rf.room_id=?",

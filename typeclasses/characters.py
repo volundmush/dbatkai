@@ -7,8 +7,9 @@ is setup to be the "default" character type created by the default
 creation commands.
 
 """
+from evennia.utils.utils import lazy_property
 from athanor.typeclasses.characters import AthanorPlayerCharacter, AthanorNonPlayerCharacter
-
+from advent.dgscripts.dgscripts import DgHandlerCharacter
 from .objects import ObjectParent
 
 
@@ -36,6 +37,7 @@ class Character(ObjectParent):
         slots = super().all_aspect_slots()
         slots["race"] = {}
         slots["sensei"] = {}
+        slots["position"] = {}
         return slots
 
     def all_quirk_slots(self) -> dict[str, dict]:
@@ -43,6 +45,10 @@ class Character(ObjectParent):
         slots["bonus"] = {}
         slots["flaw"] = {}
         return slots
+
+    @lazy_property
+    def dgscripts(self):
+        return DgHandlerCharacter(self)
 
 
 class PlayerCharacter(Character, AthanorPlayerCharacter):
